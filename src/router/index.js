@@ -4,12 +4,15 @@ import HomeView from '../views/HomeView.vue'
 import ListView from '../views/ListView.vue'
 import DetailView from '../views/DetailView.vue'
 import AboutView from '../views/AboutView.vue'
+import AnalyticsView from '../views/AnalyticsView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/list', component: ListView },
   { path: '/detail', component: DetailView },
-  { path: '/about', component: AboutView }
+  { path: '/about', component: AboutView },
+  { path: '/analytics', component: AnalyticsView }
+
 ]
 
 export default createRouter({
