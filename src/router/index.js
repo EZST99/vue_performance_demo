@@ -9,13 +9,26 @@ import AnalyticsView from '../views/AnalyticsView.vue'
 const routes = [
   { path: '/', component: HomeView },
   { path: '/list', component: ListView },
-  { path: '/detail', component: DetailView },
+  { path: '/detail/:id', component: DetailView },
   { path: '/about', component: AboutView },
   { path: '/analytics', component: AnalyticsView }
-
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  window.__routeStart = performance.now()
+  next()
+})
+
+router.afterEach(() => {
+  requestAnimationFrame(() => {
+    const duration = performance.now() - window.__routeStart
+    console.log("Route Transition Time:", duration.toFixed(2), "ms")
+  })
+})
+
+export default router
