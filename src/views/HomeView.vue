@@ -10,6 +10,7 @@ onMounted(async () => {
   await nextTick()
   requestAnimationFrame(() => {
     window.dispatchEvent(new Event('view-ready'))
+    import('../views/ListView.vue')
   })
 })
 </script>
