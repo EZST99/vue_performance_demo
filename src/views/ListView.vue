@@ -93,6 +93,8 @@ onMounted(async () => {
   await nextTick()
   requestAnimationFrame(() => {
     window.dispatchEvent(new Event('view-ready'))
+    import('../views/DetailView.vue')
+    import('../views/AboutView.vue')
   })
 })
 </script>
