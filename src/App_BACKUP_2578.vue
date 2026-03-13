@@ -29,7 +29,11 @@ function downloadResults() {
 
   const a = document.createElement("a")
   a.href = url
+<<<<<<< HEAD
   a.download = "route-measurements-expected-baseline.csv"
+=======
+  a.download = "route-measurements-expected-pfl.csv"
+>>>>>>> a14a75f (Implements light prefetching)
   a.click()
 }
 

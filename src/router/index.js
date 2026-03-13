@@ -7,11 +7,11 @@ import AboutView from '../views/AboutView.vue'
 import AnalyticsView from '../views/AnalyticsView.vue'
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/list', component: ListView },
-  { path: '/detail/:id', component: DetailView },
-  { path: '/about', component: AboutView },
-  { path: '/analytics', component: AnalyticsView }
+  { path: '/', name: 'home', component: HomeView },
+  { path: '/list', name: 'list', component: ListView },
+  { path: '/detail/:id', name: 'detail', component: DetailView },
+  { path: '/about', name: 'about', component: AboutView },
+  { path: '/analytics', name: 'analytics', component: AnalyticsView }
 ]
 
 const router = createRouter({
@@ -24,11 +24,26 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-router.afterEach(() => {
+router.afterEach((to, from) => {
   requestAnimationFrame(() => {
-    const duration = performance.now() - window.__routeStart
-    console.log("Route Transition Time:", duration.toFixed(2), "ms")
-  })
-})
+    const duration = performance.now() - window.__routeStart;
+
+    const result = {
+      from: from.name,
+      to: to.name,
+      time: Number(duration.toFixed(2))
+    };
+
+    console.log(
+      `Route Transition: ${from.name} → ${to.name} | ${duration.toFixed(2)} ms`
+    );
+
+    if (!window.__measurements) {
+      window.__measurements = [];
+    }
+
+    window.__measurements.push(result);
+  });
+});
 
 export default router
