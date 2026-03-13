@@ -42,25 +42,26 @@ onMounted(() => {
 async function runTestSequence(router) {
 
   const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const delay = 5000
 
-  await wait(2000);
-  await router.push("/list");
+  await wait(delay)
+  await router.push("/list")
 
-  await wait(3000);
-  await router.push("/analytics");
+  await wait(delay)
+  await router.push("/analytics")
 
-  await wait(5000);
-  await router.push("/about");
+  await wait(delay)
+  await router.push("/about")
 
-  await wait(2000);
-  await router.push("/list");
+  await wait(delay)
+  await router.push("/list")
 
-  await wait(2000);
-  await router.push("/detail/1");
+  await wait(delay)
+  await router.push("/detail/1")
 
-  await wait(2000);
+  await wait(delay)
 
-  console.log("MEASUREMENTS:", window.__measurements);
+  console.log("MEASUREMENTS:", window.__measurements)
 }
 
 </script>
