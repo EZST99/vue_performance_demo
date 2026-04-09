@@ -20,30 +20,40 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  if (!from.name) {
+    window.__routeStart = null
+    next()
+    return
+  }
+
   window.__routeStart = performance.now()
   next()
 })
 
 router.afterEach((to, from) => {
   requestAnimationFrame(() => {
-    const duration = performance.now() - window.__routeStart;
+    if (!from.name || !window.__routeStart) return
+
+    const duration = performance.now() - window.__routeStart
 
     const result = {
       from: from.name,
       to: to.name,
       time: Number(duration.toFixed(2))
-    };
-
-    console.log(
-      `Route Transition: ${from.name} → ${to.name} | ${duration.toFixed(2)} ms`
-    );
-
-    if (!window.__measurements) {
-      window.__measurements = [];
     }
 
-    window.__measurements.push(result);
-  });
-});
+    if (!window.__measurements) {
+      window.__measurements = []
+    }
+
+    window.__measurements.push(result)
+
+    console.log(`${result.from} → ${result.to}: ${result.time} ms`)
+  })
+})
+
+if (typeof window !== "undefined") {
+  window.router = router;
+}
 
 export default router

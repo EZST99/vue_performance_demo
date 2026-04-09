@@ -14,56 +14,10 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
-function downloadResults() {
-  const rows = window.__measurements
-    .map(r => `${r.from};${r.to};${r.time}`)
-    .join("\n")
-
-  const csv = "from;to;time\n" + rows
-
-  const blob = new Blob([csv], { type: "text/csv" })
-  const url = URL.createObjectURL(blob)
-
-  const a = document.createElement("a")
-  a.href = url
-  a.download = "route-measurements-expected-baseline.csv"
-  a.click()
-}
-
-window.downloadResults = downloadResults
 
 onMounted(() => {
-  runTestSequence(router);
-});
-
-async function runTestSequence(router) {
-
-  const wait = (ms) => new Promise(r => setTimeout(r, ms));
-  const delay = 5000
-
-  await wait(delay)
-  await router.push("/list")
-
-  await wait(delay)
-  await router.push("/analytics")
-
-  await wait(delay)
-  await router.push("/about")
-
-  await wait(delay)
-  await router.push("/list")
-
-  await wait(delay)
-  await router.push("/detail/1")
-
-  await wait(delay)
-
-  console.log("MEASUREMENTS:", window.__measurements)
-}
-
+  window.__measurements = []
+})
 </script>
 
 <style>
