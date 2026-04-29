@@ -201,7 +201,7 @@ test("measure realistic navigation flows", async ({ browser }) => {
     .toISOString()
     .replace(/[:.]/g, "-");
 
-  const filename = `results-${timestamp}.csv`;
+  const filename = `lazy-results-${timestamp}.csv`;
 
   fs.writeFileSync(filename, rawCsv + statsCsv);
 
