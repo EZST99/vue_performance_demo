@@ -1,17 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomeView from '../views/HomeView.vue'
-import ListView from '../views/ListView.vue'
-import DetailView from '../views/DetailView.vue'
-import AboutView from '../views/AboutView.vue'
-import AnalyticsView from '../views/AnalyticsView.vue'
-
 const routes = [
-  { path: '/', name: 'home', component: HomeView },
-  { path: '/list', name: 'list', component: ListView },
-  { path: '/detail/:id', name: 'detail', component: DetailView },
-  { path: '/about', name: 'about', component: AboutView },
-  { path: '/analytics', name: 'analytics', component: AnalyticsView }
+  { path: '/', name: 'home', component:() => import('../views/HomeView.vue') },
+  { path: '/list', name: 'list', component:() => import('../views/ListView.vue') },
+  { path: '/detail/:id', name: 'detail', component: () => import('../views/DetailView.vue') },
+  { path: '/about', name: 'about', component: () => import('../views/AboutView.vue') },
+  { path: '/analytics', name: 'analytics', component: () => import('../views/AnalyticsView.vue')}
 ]
 
 const router = createRouter({
@@ -64,4 +58,4 @@ if (typeof window !== "undefined") {
   window.router = router
 }
 
-export default router
+export default router;

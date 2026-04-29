@@ -21,6 +21,7 @@ async function onChildReady() {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         window.dispatchEvent(new Event('view-ready'))
+        import('../views/AboutView.vue')
       })
     })
     readyCount = 0
