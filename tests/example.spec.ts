@@ -1,5 +1,6 @@
 import { test } from "@playwright/test";
 import fs from "fs";
+import jStat from "jstat";
 
 test.setTimeout(0);
 
@@ -79,22 +80,23 @@ function calculateStats(measurements: any[]) {
     const values = groups[route];
     const n = values.length;
 
-    const mean = values.reduce((a, b) => a + b, 0) / n;
+    const mean = jStat.mean(values);
 
     let ci = 0;
 
     if (n > 1) {
-      const variance =
-        values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (n - 1);
+      const sd = jStat.stdev(values, true); // true = sample SD (wichtig!)
 
-      const sd = Math.sqrt(variance);
-      ci = 1.96 * (sd / Math.sqrt(n));
+      const t = jStat.studentt.inv(0.975, n - 1);
+
+      ci = t * (sd / Math.sqrt(n));
     }
 
     result.push({
       route,
       mean: Number(mean.toFixed(2)),
       ci: Number(ci.toFixed(2)),
+      n
     });
   }
 
@@ -113,7 +115,7 @@ function calculateStats(measurements: any[]) {
 // ---- TEST ----
 test("measure realistic navigation flows", async ({ page }) => {
 
-  const RUNS_PER_SEQUENCE = 15;
+  const RUNS_PER_SEQUENCE = 10;
   let rawResults: any[] = [];
 
   let sequenceCounter = 1;
@@ -136,22 +138,29 @@ test("measure realistic navigation flows", async ({ page }) => {
       for (let i = 1; i < sequence.length; i++) {
 
         const next = sequence[i];
+
+        // 🧍 realistischer User wartet
         await page.waitForTimeout(5000);
 
+        // 🔢 wie viele Messungen gab es vorher?
+        const beforeCount = await page.evaluate(() => window.__measurements.length);
+
+        // 👉 Navigation
         if (next === "detail") {
           await page.evaluate(() => {
             return window.router.push("/detail/1");
           });
-
-          await page.waitForFunction(() =>
-            window.location.pathname.includes("/detail")
-          );
-
         } else {
           await page.click(
             `text=${next.charAt(0).toUpperCase() + next.slice(1)}`
           );
         }
+
+        // 🔥 WICHTIG: warten bis Messung wirklich gespeichert wurde
+        await page.waitForFunction(
+          (prev) => window.__measurements.length > prev,
+          beforeCount
+        );
       }
 
       const results = await page.evaluate(() => window.__measurements);
