@@ -19,6 +19,7 @@ const router = createRouter({
   routes
 })
 
+// Performance Measurements for RTT
 router.beforeEach((to, from, next) => {
   if (!from.name) {
     window.__routeStart = null

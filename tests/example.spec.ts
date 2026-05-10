@@ -4,7 +4,7 @@ import jStat from "jstat";
 
 test.setTimeout(0);
 
-// ---- TYPES ----
+// TYPES
 type Measurement = {
   from: string;
   to: string;
@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-// ---- PERMUTATION ----
+// PERMUTATION
 function permute(arr: string[]): string[][] {
   if (arr.length === 0) return [[]];
 
@@ -37,7 +37,7 @@ function permute(arr: string[]): string[][] {
   return result;
 }
 
-// ---- ROUTES ----
+// ROUTES
 const baseRoutes = ["list", "analytics", "about"];
 
 const baseSequences = permute(baseRoutes).map(seq => ["home", ...seq]);
@@ -58,7 +58,7 @@ function expandWithDetail(sequence: string[]) {
 
 const allSequences = baseSequences.flatMap(expandWithDetail);
 
-// ---- STATS ----
+// STATS 
 function groupByRoute(measurements: any[]) {
   const groups: Record<string, number[]> = {};
 
@@ -85,7 +85,7 @@ function calculateStats(measurements: any[]) {
     let ci = 0;
 
     if (n > 1) {
-      const sd = jStat.stdev(values, true); // true = sample SD (wichtig!)
+      const sd = jStat.stdev(values, true); 
 
       const t = jStat.studentt.inv(0.975, n - 1);
 
@@ -112,7 +112,7 @@ function calculateStats(measurements: any[]) {
   return result;
 }
 
-// ---- TEST ----
+// TEST 
 test("measure realistic navigation flows", async ({ page }) => {
 
   const RUNS_PER_SEQUENCE = 10;
@@ -139,13 +139,10 @@ test("measure realistic navigation flows", async ({ page }) => {
 
         const next = sequence[i];
 
-        // 🧍 realistischer User wartet
         await page.waitForTimeout(5000);
 
-        // 🔢 wie viele Messungen gab es vorher?
         const beforeCount = await page.evaluate(() => window.__measurements.length);
 
-        // 👉 Navigation
         if (next === "detail") {
           await page.evaluate(() => {
             return window.router.push("/detail/1");
@@ -156,7 +153,6 @@ test("measure realistic navigation flows", async ({ page }) => {
           );
         }
 
-        // 🔥 WICHTIG: warten bis Messung wirklich gespeichert wurde
         await page.waitForFunction(
           (prev) => window.__measurements.length > prev,
           beforeCount
@@ -180,14 +176,14 @@ test("measure realistic navigation flows", async ({ page }) => {
     sequenceCounter++;
   }
 
-  // ---- RAW CSV ----
+  // RAW CSV 
   const rawRows = rawResults
     .map(r => `${r.sequenceId};${r.sequence};${r.run};${r.from};${r.to};${r.time}`)
     .join("\n");
 
   const rawCsv = "sequenceId;sequence;run;from;to;time\n" + rawRows;
 
-  // ---- SUMMARY ----
+  // SUMMARY 
   const stats = calculateStats(rawResults);
 
   const statsRows = stats
@@ -196,7 +192,7 @@ test("measure realistic navigation flows", async ({ page }) => {
 
   const statsCsv = "\n\nSUMMARY\nroute;mean;ci\n" + statsRows;
 
-  // ---- SAVE ----
+  // SAVE
   const timestamp = new Date()
     .toISOString()
     .replace(/[:.]/g, "-");
