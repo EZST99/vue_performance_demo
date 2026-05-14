@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 
 // simulates 2500 Items
 const items = Array.from({ length: 2500 }, (_, i) => ({
@@ -88,4 +88,11 @@ function nextPage() {
 function prevPage() {
   if (page.value > 1) page.value--
 }
+
+onMounted(async () => {
+  await nextTick()
+  requestAnimationFrame(() => {
+    window.dispatchEvent(new Event('view-ready'))
+  })
+})
 </script>

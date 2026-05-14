@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { test, BrowserContext, Page } from "@playwright/test";
 import fs from "fs";
 import jStat from "jstat";
 
@@ -14,6 +14,7 @@ type Measurement = {
 declare global {
   interface Window {
     __measurements: Measurement[];
+    __pendingRouteMeasurement: { from: string; to: string } | null;
     __routeStart: number | null;
     router: any;
   }
@@ -112,22 +113,23 @@ function calculateStats(measurements: any[]) {
   return result;
 }
 
-// TEST 
-test("measure realistic navigation flows", async ({ page }) => {
-
-  const RUNS_PER_SEQUENCE = 10;
-  let rawResults: any[] = [];
+// TEST
+test("measure realistic navigation flows", async ({ browser }) => {
+  const RUNS_PER_SEQUENCE = 2;
+  const rawResults: any[] = [];
 
   let sequenceCounter = 1;
 
   for (const sequence of allSequences) {
-
     const sequenceId = `S${sequenceCounter}`;
     const sequenceName = sequence.join("-");
 
-    console.log(`Sequence ${sequenceId}:`, sequenceName);
+    console.log(`Sequence ${sequenceId}: ${sequenceName}`);
 
     for (let run = 0; run < RUNS_PER_SEQUENCE; run++) {
+      // fresh browser context for every run
+      const context: BrowserContext = await browser.newContext();
+      const page: Page = await context.newPage();
 
       await page.goto("/");
 
@@ -171,6 +173,8 @@ test("measure realistic navigation flows", async ({ page }) => {
           time: r.time,
         });
       });
+
+      await context.close();
     }
 
     sequenceCounter++;
@@ -187,10 +191,10 @@ test("measure realistic navigation flows", async ({ page }) => {
   const stats = calculateStats(rawResults);
 
   const statsRows = stats
-    .map(s => `${s.route};${s.mean};${s.ci}`)
+    .map(s => `${s.route};${s.mean};${s.ci};${s.n}`)
     .join("\n");
 
-  const statsCsv = "\n\nSUMMARY\nroute;mean;ci\n" + statsRows;
+  const statsCsv = "\n\nSUMMARY\nroute;mean;ci;n\n" + statsRows;
 
   // SAVE
   const timestamp = new Date()

@@ -5,13 +5,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import Chart from 'chart.js/auto'
 import bigData from '../data/largeData.json'
 
+const emit = defineEmits(['ready'])
 const chartCanvas = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
   new Chart(chartCanvas.value, {
     type: 'line',
     data: {
@@ -23,6 +24,11 @@ onMounted(() => {
         }
       ]
     }
+  })
+
+  await nextTick()
+  requestAnimationFrame(() => {
+    emit('ready')
   })
 })
 </script>

@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -32,4 +32,11 @@ const items = Array.from({ length: 2000 }, (_, i) => ({
 const item = computed(() =>
   items.find(i => i.id === Number(route.params.id))
 )
+
+onMounted(async () => {
+  await nextTick()
+  requestAnimationFrame(() => {
+    window.dispatchEvent(new Event('view-ready'))
+  })
+})
 </script>

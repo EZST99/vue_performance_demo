@@ -5,7 +5,7 @@ export default defineConfig({
 
   use: {
     headless: false, // WICHTIG
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:4173',
   },
 
   projects: [

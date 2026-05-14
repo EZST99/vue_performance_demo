@@ -23,23 +23,29 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (!from.name) {
     window.__routeStart = null
+    window.__pendingRouteMeasurement = null
     next()
     return
   }
 
   window.__routeStart = performance.now()
+  window.__pendingRouteMeasurement = {
+    from: String(from.name),
+    to: String(to.name)
+  }
+
   next()
 })
 
-router.afterEach((to, from) => {
-  requestAnimationFrame(() => {
-    if (!from.name || !window.__routeStart) return
+if (typeof window !== "undefined") {
+  window.addEventListener("view-ready", () => {
+    if (!window.__routeStart || !window.__pendingRouteMeasurement) return
 
     const duration = performance.now() - window.__routeStart
 
     const result = {
-      from: from.name,
-      to: to.name,
+      from: window.__pendingRouteMeasurement.from,
+      to: window.__pendingRouteMeasurement.to,
       time: Number(duration.toFixed(2))
     }
 
@@ -50,11 +56,12 @@ router.afterEach((to, from) => {
     window.__measurements.push(result)
 
     console.log(`${result.from} → ${result.to}: ${result.time} ms`)
-  })
-})
 
-if (typeof window !== "undefined") {
-  window.router = router;
+    window.__routeStart = null
+    window.__pendingRouteMeasurement = null
+  })
+
+  window.router = router
 }
 
 export default router
